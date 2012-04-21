@@ -80,26 +80,28 @@ public class Account
     {
         private AccountId id;
 
-        private String name;
+        private final String name;
 
         private String description;
 
         private final Map<String, String> metadata = new HashMap<String, String>();
 
-        public Builder withId( final String id )
+        public Builder( final String id, final String name )
+            throws MoolahDataException
         {
+            if ( id == null || isEmpty( name ) )
+            {
+                throw new MoolahDataException(
+                                               "You must specify a valid ID and name for a new account. (ID: '%s', name: '%s')",
+                                               id, name );
+            }
+
             if ( !isEmpty( id ) )
             {
                 this.id = new AccountId( id );
             }
 
-            return this;
-        }
-
-        public Builder withName( final String name )
-        {
             this.name = name;
-            return this;
         }
 
         public Builder withDescription( final String description )
@@ -121,15 +123,7 @@ public class Account
         }
 
         public Account build()
-            throws MoolahDataException
         {
-            if ( id == null || isEmpty( name ) )
-            {
-                throw new MoolahDataException(
-                                               "You must specify a valid ID and name for a new account. (ID: '%s', name: '%s')",
-                                               id, name );
-            }
-
             return new Account( id, name, description, metadata );
         }
     }

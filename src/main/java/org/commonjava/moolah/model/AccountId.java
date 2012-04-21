@@ -10,8 +10,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
@@ -95,7 +95,9 @@ public class AccountId
         @Override
         public JsonElement serialize( final AccountId src, final Type typeOfSrc, final JsonSerializationContext context )
         {
-            return new JsonPrimitive( src.id );
+            final JsonObject obj = new JsonObject();
+            obj.addProperty( ID_PROPERTY, src.id );
+            return obj;
         }
 
         @Override

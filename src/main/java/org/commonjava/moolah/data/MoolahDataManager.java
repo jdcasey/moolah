@@ -3,7 +3,6 @@ package org.commonjava.moolah.data;
 import static org.apache.commons.lang.StringUtils.join;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,6 +13,7 @@ import org.commonjava.couch.db.CouchDBException;
 import org.commonjava.couch.db.CouchManager;
 import org.commonjava.couch.model.CouchApp;
 import org.commonjava.couch.model.CouchDocRef;
+import org.commonjava.moolah.data.query.AccountQuery;
 import org.commonjava.moolah.data.view.AccountBalance;
 import org.commonjava.moolah.data.view.AccountEntry;
 import org.commonjava.moolah.data.view.AccountList;
@@ -202,7 +202,7 @@ public class MoolahDataManager
     public AccountBalance getAccountBalance( final AccountId account )
         throws MoolahDataException
     {
-        final MoolahBalanceRequest req = new MoolahBalanceRequest( account );
+        final MoolahViewRequest req = new MoolahViewRequest( account, MoolahView.balance );
         try
         {
             return couch.getView( req, AccountBalance.class );
@@ -214,32 +214,32 @@ public class MoolahDataManager
         }
     }
 
-    public List<AccountEntry> getAccountEntries( final AccountId account, final Date start, final Date end )
+    public List<AccountEntry> getAccountEntries( final AccountQuery query )
         throws MoolahDataException
     {
         try
         {
-            return couch.getViewListing( new MoolahAccountEntriesRequest( account, start, end ), AccountEntry.class );
+            return couch.getViewListing( new MoolahViewRequest( query, MoolahView.account_entries ), AccountEntry.class );
         }
         catch ( final CouchDBException e )
         {
-            throw new MoolahDataException( "Failed to entries for account: %s. Error: %s", e, account, e.getMessage() );
+            throw new MoolahDataException( "Failed to entries for account query: %s. Error: %s", e, query,
+                                           e.getMessage() );
         }
     }
 
-    public List<Transaction> getTransactions( final AccountId account, final Date start, final Date end )
+    public List<Transaction> getTransactions( final AccountQuery query )
         throws MoolahDataException
     {
-        final MoolahTransactionRequest req = new MoolahTransactionRequest( account, start, end );
+        final MoolahViewRequest req = new MoolahViewRequest( query, MoolahView.transactions );
         try
         {
             return couch.getViewListing( req, Transaction.class );
         }
         catch ( final CouchDBException e )
         {
-            throw new MoolahDataException(
-                                           "Failed to retrieve transaction list referencing account: %s between: % and: %s. Error: %s",
-                                           e, account, start, end, e.getMessage() );
+            throw new MoolahDataException( "Failed to retrieve transaction list using account query: %s. Error: %s", e,
+                                           query, e.getMessage() );
         }
     }
 

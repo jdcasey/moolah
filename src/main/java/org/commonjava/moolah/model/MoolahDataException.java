@@ -31,13 +31,16 @@ public class MoolahDataException
     @Override
     public String getMessage()
     {
-        final String format = super.getMessage();
-        try
+        String format = super.getMessage();
+        if ( params != null && params.length > 0 )
         {
-            String.format( format, params );
-        }
-        catch ( final IllegalFormatException e )
-        {
+            try
+            {
+                format = String.format( format, params );
+            }
+            catch ( final IllegalFormatException e )
+            {
+            }
         }
 
         return format;
